@@ -2,81 +2,95 @@ import 'package:flutter/material.dart';
 
 import 'data.dart';
 
-class StoreAppbar extends SliverAppBar {
-  final bool isCollacpsed;
-  final void Function(int index) onTap;
-  final void Function(bool isCollapsed) onCollapsed;
+class FAppBar extends SliverAppBar {
+  final PageData data;
+  final BuildContext context;
+  final bool isCollapsed;
+  @override
+  final double? expandedHeight;
+  @override
+  final double collapsedHeight;
   final TabController tabController;
-  const StoreAppbar(
-    this.tabController,
-    this.onTap,
-    this.onCollapsed, {
-    required this.isCollacpsed,
-  });
+  final void Function(bool isCollapsed) onCollapsed;
+  final void Function(int index) onTap;
 
+  const FAppBar({
+    super.key,
+    required this.data,
+    required this.context,
+    required this.isCollapsed,
+    required this.expandedHeight, // 展開的高度。
+    required this.collapsedHeight,
+    required this.onCollapsed,
+    required this.onTap,
+    required this.tabController,
+  }) : super(
+            elevation: 4.0,
+            pinned: true,
+            forceElevated: true,
+            expandedHeight: expandedHeight);
+
+  /// super() 是用來繼承父親 Widget 裡面的屬性 or function
   @override
-  Color? get backgroundColor => Colors.amber;
+  Color? get backgroundColor => Colors.white;
 
-  @override
-  Widget? get leading {
-    return IconButton(onPressed: () {}, icon: const Icon(Icons.arrow_back));
-  }
+  /// SliverBar 的 leading
 
+  /// SliverAppBar 的 actions
   @override
   List<Widget>? get actions {
-    return [
-      IconButton(
-        icon: const Icon(Icons.home_outlined),
-        onPressed: () {},
-      ),
-      IconButton(
-        icon: const Icon(Icons.star),
-        onPressed: () {},
-      ),
-    ];
+    return [const Icon(Icons.abc)];
   }
 
+  /// SliverAppBar Title 慢慢出現的動畫，只有在縮小才看得到，subTitle 也寫在這。
   @override
   Widget? get title {
+    var textTheme = Theme.of(context).textTheme;
+    print(isCollapsed);
     // AnimatedOpacity => https://api.flutter.dev/flutter/widgets/AnimatedOpacity-class.html
     return AnimatedOpacity(
       // 0 == invisible, 1 == visible
-      opacity: isCollacpsed ? 0 : 1, // 判斷 SliverAppBar 是展開還是縮小。
+      opacity: isCollapsed ? 0 : 1, // 判斷 SliverAppBar 是展開還是縮小。
       duration: const Duration(milliseconds: 250),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: const [
+        children: [
           Text(
             "癮茶",
+            style: textTheme.titleMedium?.copyWith(color: Colors.red),
           ),
-          SizedBox(height: 4.0),
-          Text('text'),
+          const SizedBox(height: 4.0),
+          Text(
+            data.deliverTime,
+            style: textTheme.bodySmall?.copyWith(color: Colors.blue),
+          ),
         ],
       ),
     );
   }
 
+  /// AppBar 的 bottom 不會被縮小。
   @override
   PreferredSizeWidget? get bottom {
     return PreferredSize(
       preferredSize: const Size.fromHeight(48),
       child: Container(
-        color: Colors.green,
+        color: Colors.amber,
         child: TabBar(
           isScrollable: true,
           // 是否可以滾動
           controller: tabController,
           // https://api.flutter.dev/flutter/material/TabController-class.html
           indicatorPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-          indicatorColor: Colors.black,
+          indicatorColor: Colors.red,
           // tabBar 下面一條線的顏色
-          labelColor: Colors.pink,
+          labelColor: Colors.black12,
           // 被選到標籤顏色
-          unselectedLabelColor: Colors.red,
+          unselectedLabelColor: Colors.blueAccent,
           // 為被選到的顏色
           indicatorWeight: 3.0,
           // 下面標籤的高度
-          tabs: ExampleData.data.categories.map((e) {
+          tabs: data.categories.map((e) {
             return Tab(text: e.title);
           }).toList(),
           // 想要把 list 裡面的 data 轉換成 Widget
@@ -86,6 +100,7 @@ class StoreAppbar extends SliverAppBar {
     );
   }
 
+  /// 只有展開才看得到的 FlexibleSpaceBar 屬性
   @override
   Widget? get flexibleSpace {
     return LayoutBuilder(
@@ -110,18 +125,19 @@ class StoreAppbar extends SliverAppBar {
             children: [
               Stack(
                 children: [
+                  const Text("dtat"),
+                  Container(
+                    color: Colors.blueGrey,
+                  ),
                   Column(
                     children: [
-                      HeaderClip(data: ExampleData.data, context: context),
-                      // 餐廳上方圖片，有形狀的那個。
+                      Container(
+                        color: Colors.amber,
+                      ),
                       const SizedBox(height: 90),
                     ],
                   ),
                 ],
-              ),
-              DiscountCard(
-                title: ExampleData.data.optionalCard.title,
-                subtitle: ExampleData.data.optionalCard.subtitle,
               ),
             ],
           ),
