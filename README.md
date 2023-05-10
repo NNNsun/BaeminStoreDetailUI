@@ -1,6 +1,4 @@
-# store_test
-
-A new Flutter project.
+# 배달앱 UI 분석용 테스트 프로젝트
 
 ## Getting Started
 
